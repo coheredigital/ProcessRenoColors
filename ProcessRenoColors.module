@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * Color Options for Reno Theme
+ *
+ * @copyright 2016, Adam Spruijt
+ *
+ * ProcessWire 2.x
+ * Copyright (C) 2010 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+
+
+
+class ProcessRenoColors extends Textformatter implements Module, ConfigurableModule {
+
+    public static function getModuleInfo() {
+        return array(
+            'title' => __("Reno Colors", __FILE__),
+            'summary' => __("Allows full control of Reno Theme colors right in admin. And a few other tweaks.", __FILE__),
+            'author' => 'Adam Spruijt',
+            'version' => 1,
+            'autoload' => true,
+            'singular' => true
+        );
+    }
+
+
+    protected $less; // store the less compiler
+
+    public function init() {
+                // check if lessc is already loaded, fixes exception when less is loaded as default from composer / another source
+        if (!class_exists("lessc")) {
+            require_once 'lessphp/lessc.inc.php';
+        }
+
+        $this->less = new lessc;
+        $this->less->setFormatter("compressed");
+        
+
+        $this->modules->addHookBefore('saveModuleConfigData', function($event){
+
+            $this->less->setVariables([
+                "header_background_color" => "{$this->header_background_color}",
+                "link_color" => "{$this->link_color}",
+            ]);
+
+            $this->less->compileFile("{$this->config->paths->ProcessRenoColors}RenoColors.less","{$this->config->paths->ProcessRenoColors}RenoColors.css");
+        });  
+    }
+
+    public function ready() {
+        
+        if($this->page->template == 'admin') 
+            $this->config->styles->add("{$this->config->urls->ProcessRenoColors}RenoColors.css");
+    }
+
+    protected function compileColorTheme(){
+
+
+
+    }
+
+
+}

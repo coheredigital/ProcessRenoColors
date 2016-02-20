@@ -1,0 +1,25 @@
+@header_background_color_light : lighten(@header_background_color, 40%);
+
+#wrap{
+
+	.main-nav-toggle{
+		background: transparent !important;
+	}
+
+	#branding,
+	#masthead{
+		background: @header_background_color;
+		a,
+		i{
+			color: @header_background_color_light
+		}
+
+	}
+	.main-nav-toggle,
+	.main-nav-toggle:before{
+		color: @header_background_color_light
+	}
+
+
+}
+
