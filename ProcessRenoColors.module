@@ -30,10 +30,15 @@ class ProcessRenoColors extends Textformatter implements Module, ConfigurableMod
     }
 
 
-    protected $less; // store the less compiler
+    protected $less;
+    protected $compiledFolder; 
+
 
     public function init() {
-                // check if lessc is already loaded, fixes exception when less is loaded as default from composer / another source
+
+        $this->compiledFolder = "{$this->config->paths->ProcessRenoColors}compiled/";
+
+        // check if lessc is already loaded, fixes exception when less is loaded as default from composer / another source
         if (!class_exists("lessc")) {
             require_once 'lessphp/lessc.inc.php';
         }
@@ -42,27 +47,44 @@ class ProcessRenoColors extends Textformatter implements Module, ConfigurableMod
         $this->less->setFormatter("compressed");
         
 
+
         $this->modules->addHookBefore('saveModuleConfigData', function($event){
 
-            $this->less->setVariables([
-                "header_background_color" => "{$this->header_background_color}",
-                "link_color" => "{$this->link_color}",
-            ]);
+            $data = $event->arguments(1);
 
-            $this->less->compileFile("{$this->config->paths->ProcessRenoColors}RenoColors.less","{$this->config->paths->ProcessRenoColors}RenoColors.css");
+            // collect the array of colors
+            $colors = [];
+            foreach ($data as $key => $value) {
+                if (strpos($key, "_color") !== false) {
+                    $colors["$key"] = $value ?: "#333";
+                }
+            }
+
+            // overwrite compile hash
+            $hash = md5(implode("", $colors));
+            $themeFile = "{$this->config->paths->ProcessRenoColors}theme.less";
+            
+            $compiledFile = "{$this->compiledFolder}theme-{$hash}.css";
+
+            // empty compile folder
+            foreach(glob("{$this->compiledFolder}*") as $file){ 
+                if(is_file($file)) unlink($file); 
+            }
+
+            $this->less->setVariables($colors);
+            $this->less->compileFile($themeFile, $compiledFile);
         });  
     }
 
     public function ready() {
         
+        // empty compile folder
+        foreach(glob("{$this->compiledFolder}*") as $file){ 
+            if(file_exists($file)) $filename = basename($file); 
+        }
+
         if($this->page->template == 'admin') 
-            $this->config->styles->add("{$this->config->urls->ProcessRenoColors}RenoColors.css");
-    }
-
-    protected function compileColorTheme(){
-
-
-
+            $this->config->styles->add("{$this->config->urls->ProcessRenoColors}compiled/{$filename}");
     }
 
 

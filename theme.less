@@ -1,0 +1,63 @@
+@header_color_light : lighten(@header_color, 40%);
+
+#wrap{
+
+	.main-nav-toggle{
+		background: transparent !important;
+		border-left-color: darken(@header_color, 10%);
+	}
+
+	#branding,
+	#masthead{
+		background: @header_color;
+		a,
+		i{
+			color: @header_color_light
+		}
+
+	}
+	.main-nav-toggle,
+	.main-nav-toggle:before{
+		color: @header_color_light
+	}
+
+
+	#sidebar{
+		background: @sidebar_color;
+		#main-nav li ul, a.open, .current.parent, #main-nav > li:not(.current) > a:hover:not(.current) {
+			background: darken(@sidebar_color, 10%);
+		}
+		#main-nav {
+			a, i {
+				color: #fff !important;
+				opacity: .6;
+				&.current{
+					opacity: 1;
+				}
+			}
+			> li {
+				li {
+					a:hover{
+						background:  @header_color !important;
+						opacity: 1;
+					}
+				}
+			}
+
+		}
+
+
+	}
+
+	// buttons 
+	.ui-button, button.ui-button.ui-state-default, .ui-button.ui-state-default {
+		background: @button_color;
+		border-color: @button_color;
+		&:hover{
+			background: darken(@button_color, 10%);
+			border-color: darken(@button_color, 10%);
+		}
+	}
+
+}
+
